@@ -2,7 +2,7 @@
 
 `assets/banner.png` is an AI-generated fictional illustration made for this methods repository. It is not a screenshot, map output, measured model or representation of an actual campus. No reference image, dataset, geographic coordinates, building model or local map output was supplied.
 
-The built-in image-generation tool generated one image. The tool did not expose a reproducible seed or model version. No API-key workflow or paid API script was used. Generation may not reproduce identical pixels. Embedded generation metadata was removed losslessly; image pixels were retained.
+The built-in image-generation tool generated one image. The tool did not expose a reproducible seed or model version. No API-key workflow or paid API script was used. Generation may not reproduce identical pixels. Embedded generation metadata was removed losslessly; image pixels were retained. On 2026-11-15 the file was re-encoded losslessly (identical decoded pixels, no metadata chunks) with a different compression layout; nothing in the picture changed.
 
 ## Generation direction
 

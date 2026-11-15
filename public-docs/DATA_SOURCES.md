@@ -1,6 +1,6 @@
 # Public source references
 
-References only, apart from one deliberately small tutorial sample: [`sample/`](../sample/README.md) holds a 130 × 132 m extract from OpenStreetMap (ODbL), USA Structures (CC BY 4.0) and USGS 3DEP (public domain), with its provenance, changes and required attribution. No other source records, geographic extracts, point clouds, photographs, directory data, route shapes or model weights are distributed. Tests do not download from these sources.
+References only, apart from one deliberately small tutorial sample: [`sample/`](../sample/README.md) holds a 130 × 132 m extract from OpenStreetMap (ODbL), USA Structures (CC BY 4.0) and USGS 3DEP (public domain), plus a list of 1,564 bright stars from Wikidata (CC0), with provenance, changes and required attribution. No other source records, geographic extracts, point clouds, photographs, directory data, route shapes or model weights are distributed. Tests do not download from these sources. The [toolkit README](../toolkit/README.md) explains how to download the first three by hand for an area you choose, from the publishers' own download pages; the data stays under its own licence. Its download script, `fetch.mjs`, obeys each host's `robots.txt` and fails closed; on 2026-11-15 all three services refused automated access, so it stops by design.
 
 | Public source | Potential role | Record before use |
 | --- | --- | --- |
@@ -10,6 +10,9 @@ References only, apart from one deliberately small tutorial sample: [`sample/`](
 | [USGS elevation and lidar specifications](https://www.usgs.gov/ngp-standards-and-specifications/3d-elevation-program-standards-and-specifications) | Classification, terrain and surface product interpretation | Specification and metadata for the selected collection |
 | [The National Map](https://apps.nationalmap.gov/downloader/) | Discover public elevation products for an independently selected area | Dataset identifier, publisher, date, terms and checksum |
 | [USA Structures](https://gis-fema.hub.arcgis.com/datasets/fedmaps::usa-structures/about) | Structure footprints with heights (ORNL and FEMA Geospatial Response Office) | Licence (CC BY 4.0 attribution), production and image dates, validation status |
+| [3DEP point clouds](https://www.usgs.gov/3d-elevation-program) | Classified lidar for roof levels and model checks (ALGORITHMS.md §13) | Project, collection date, classes present, vertical datum and geoid |
+| [Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API) | Queries of current OpenStreetMap data for a bounding box | Server usage policy; keep queries small and identify your client |
+| [Wikidata](https://www.wikidata.org/) | Star positions and magnitudes (CC0) for a night sky | Query date, the properties used, and how duplicates were merged |
 
 USGS explains the [difference between lidar and bare-earth elevation models](https://www.usgs.gov/faqs/what-difference-between-lidar-data-and-a-digital-elevation-model-dem). Keep that distinction when combining terrain and building heights.
 

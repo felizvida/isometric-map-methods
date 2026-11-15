@@ -3,6 +3,8 @@ name: guarded-map-painting
 description: Run layout-preserving map painting with representative spot review, immutable settings, semantic compositing and resumable frame verification.
 ---
 
+A painted layer is optional: the live 3D map is complete without it, and a painting goes stale building by building as models change (track appearance hashes). The "painter" can be an image model, an illustrator working over the exported frames, or a procedural style (ALGORITHMS.md §16); the checks below apply to all three.
+
 Read the supplied runner before executing it. Check for another active painting process and verify its run identity before starting or resuming. Freeze geometry, camera, terrain, dimensions, overlap, tool settings and source hashes.
 
 Run representative spots before a costly full grid. Show the actual spot image and obtain any user-required appearance approval before proceeding. Describe appearance neutrally through colour, texture, foliage and architectural detail. Do not substitute a model, quality setting or method without authorisation.

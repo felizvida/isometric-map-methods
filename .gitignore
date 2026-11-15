@@ -20,9 +20,6 @@
 !/public-docs/
 /public-docs/**
 !/public-docs/*.md
-!/publication/
-/publication/**
-!/publication/check.py
 !/assets/
 /assets/**
 !/assets/banner.png
@@ -32,6 +29,7 @@
 !/sample/features.geojson
 !/sample/structures.geojson
 !/sample/terrain.json
+!/sample/stars.json
 !/tutorial/
 /tutorial/**
 !/tutorial/*.mjs
@@ -43,6 +41,15 @@
 !/public-skills/*/
 !/public-skills/*/SKILL.md
 !/public-skills/README.md
+!/toolkit/
+/toolkit/**
+!/toolkit/*.mjs
+!/toolkit/README.md
+!/toolkit/lib/
+!/toolkit/lib/*.mjs
+!/toolkit/viewer/
+!/toolkit/viewer/*.mjs
+!/toolkit/viewer/index.html
 !/.github/
 /.github/**
 !/.github/workflows/

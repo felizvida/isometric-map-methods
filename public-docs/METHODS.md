@@ -1,6 +1,24 @@
 # Terrain-aware isometric map methods
 
-These implementations generalise engineering techniques from a mapping project. They have no geographic origin, building identifiers, real camera calibration, provider adapter or real-world model parameters. The [hands-on tutorial](../tutorial/README.md) applies them to a small public-data sample.
+These implementations generalise engineering techniques from a mapping project. They have no geographic origin, building identifiers, real camera calibration, provider adapter or real-world model parameters. The [hands-on tutorial](../tutorial/README.md) applies them to a small public-data sample, and the [toolkit](../toolkit/README.md) assembles them into a working map. [ALGORITHMS.md](ALGORITHMS.md) is the full reference, with every formula and constant. This page gives the limits of each published module.
+
+| Module | Method | ALGORITHMS.md |
+| --- | --- | --- |
+| `terrain.mjs` | crack-free triangulation of quadtree leaves | §2 |
+| `projection.mjs` | orthographic projection and its height-aware inverse | §10 |
+| `buildings.mjs` | oriented box, height priority, seating, roof forms, facade bays | §3 |
+| `roof.mjs` | bilinear saddle (hypar) surface | §3.2 |
+| `collision.mjs` | segment hash, swept movement, push-out, fence openings, walls sliced from a mesh | §6 |
+| `graph.mjs` | network from lines, A*, main network, pruning, pavement offset | §7 |
+| `ground.mjs` | mode-labelled routes, observer pose, swept boxes, stopping speed | §7, [GROUND_LEVEL.md](GROUND_LEVEL.md) |
+| `sky.mjs` | sun, moon, sidereal time, stars, light and season weights | §8, §9 |
+| `traffic.mjs` | car following (IDM), lanes, junction zones, U-turns, turn weights | §14 |
+| `roles.mjs`, `conversation.mjs` | weighted stops and roles; brief replies with one owner | §14, [GROUND_LEVEL.md](GROUND_LEVEL.md) |
+| `motion.mjs` | animation of confirmed live positions | below |
+| `lidar.mjs` | surface and ground rasters, roof levels, agreement, audit classes | §13 |
+| `packs.mjs` | content-addressed data packs, appearance and label hashes | §12 |
+| `raster.py` | alignment, compositing, gains and blending for painted frames | §16 |
+| `provenance.py` | settings hashes and file manifests | §16, §18 |
 
 ## Terrain before appearance
 
@@ -45,6 +63,18 @@ An image model controls appearance. Its output is not authoritative geometry, te
 ## Confirmed live motion
 
 Keep provider access outside the renderer. Normalise coordinate units and timestamps before passing fixes to `ConfirmedMotion`. Wall-clock seconds govern freshness; monotonic milliseconds govern animation. Duplicate and older timestamps cannot rewind or restart motion. Excessive gaps or speed snap to a confirmed location; stale fixes disappear. Interpolation stops at the newest fix with no extrapolation. This module has no route estimation, map matching or network poller.
+
+## Sky, collision, networks, lidar and packs
+
+`sky.mjs` follows the NOAA solar formulas (about 0.01°) and low-precision lunar terms (about 0.3°), and ignores precession for stars (about 0.4° by 2026). That is enough for lighting and a believable sky, not for navigation or astronomy. Times are absolute `Date` values; local hours for star limits are solar hours from longitude.
+
+`collision.mjs` treats walls as zero-thickness segments, so every movement must go through `sweep`, and a push must be swept too. Its tolerances (1 cm skin, 1e−7 along walls) suit metre coordinates. It does not model height: a wall stops movement whatever its height, so low steps and kerbs need their own rules. `sliceWalls` assumes the mesh's walls are closed where they should be solid.
+
+`graph.mjs` welds nodes by rounding, so two different paths within 10 cm of each other merge. A* needs every cost multiplier to be at least 1. `mainNetwork` keeps one core; a site with genuinely separate walkable areas needs one core each.
+
+`lidar.mjs` expects ASPRS classes and heights in the same vertical datum as the terrain. Histogram peaks need enough samples: a roof smaller than about 20 lidar cells gives unreliable levels. Agreement thresholds (2 m and 3 m) suit buildings, not fine roof detail.
+
+`packs.mjs` sorts keys at every level, so the same data always gives the same bytes; arrays keep their order. It uses Node.js's crypto module; in a browser, recompute the SHA-256 with `crypto.subtle`, which is available only in secure contexts.
 
 ## Release and visual checks
 

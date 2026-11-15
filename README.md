@@ -2,80 +2,92 @@
 
 ![Fictional terrain becoming a geometric and painterly map](assets/banner.png)
 
-Reusable methods for turning terrain and geometry into an aligned, illustrated isometric map. This repository shares algorithms, verification methods, public source references and reusable agent workflows developed during a campus-map project.
+Methods, a working toolkit and a complete written reference for terrain-aware isometric maps. The maps can be turned, lit for any date and time, and walked through at eye level. Everything here can be rebuilt by a person without AI: the algorithms are specified with their formulas and constants, the code is plain JavaScript and Python with no dependencies beyond NumPy, and the data is public.
 
-**Methods, plus one small open-data sample.** No campus datasets, real building models, directory records, map tiles, operational endpoints or deployment are included. The banner is fictional. The method tests create synthetic inputs. The one exception is a [hands-on tutorial](tutorial/README.md) on a deliberately small sample of public data (a neighbourhood park, 130 × 132 m, about 40 KB) in [`sample/`](sample/README.md). Its data stays under its own licences.
+**Public data only.** This repository contains no site datasets, building models, directory records, map tiles, operational endpoints or deployment details. The method tests create synthetic inputs. The one exception is a deliberately small open-data sample (a neighbourhood park, 130 × 132 m, plus a CC0 star list) in [`sample/`](sample/README.md), which keeps its own licences. The banner is fictional.
 
-This is an independent methods reference, not an official NIH/NICHD product or endorsement.
+## Start here
 
-## What you can use
-
-| Module | Purpose |
+| If you want to | Read or run |
 | --- | --- |
-| [terrain.mjs](methods/terrain.mjs) | Matching terrain edges across different leaf resolutions |
-| [projection.mjs](methods/projection.mjs) | Orthographic projection and inverse at a known elevation |
-| [roof.mjs](methods/roof.mjs) | Parametric saddle surface without a site-specific model |
-| [motion.mjs](methods/motion.mjs) | Confirmed-fix animation with old and stale update guards |
-| [ground.mjs](methods/ground.mjs) | Mode-aware routes, ground-relative observer poses, swept box contact and forward stopping caps |
-| [roles.mjs](methods/roles.mjs) | Weighted fictional-role stops and selected conversation briefs |
-| [conversation.mjs](methods/conversation.mjs) | Shared-panel ownership, queued replies, cancellation and brief response budgets |
-| [raster.py](methods/raster.py) | Alignment, semantic compositing, bounded colour gains and overlap blending |
-| [provenance.py](methods/provenance.py) | Immutable settings hashes and selected regular-file manifests |
-
-These are small reference implementations. They do not include a complete map application, GIS ingestion stack, image-generation client or production orchestration.
-
-## Try it on real ground
-
-[`tutorial/`](tutorial/README.md) walks through four short scripts on the [sample](sample/README.md): bringing OpenStreetMap footprints, USA Structures heights and USGS terrain into one frame; a crack-free adaptive terrain mesh; blocks seated on sloping ground; and an isometric render with the published camera.
-
-```bash
-node tutorial/step1-load.mjs
-node tutorial/step2-terrain.mjs
-node tutorial/step3-buildings.mjs
-node tutorial/step4-render.mjs   # writes tutorial/out/preview.png
-```
+| See a map in two minutes, offline | `node toolkit/build.mjs --sample --out=work/sample`, then open `work/sample/map.html` |
+| Make a map of your own small area | [toolkit/README.md](toolkit/README.md): download three public files, then `build.mjs` |
+| Learn the methods step by step | [tutorial/README.md](tutorial/README.md): eight short steps on the sample |
+| Rebuild the full system by hand | [public-docs/RECREATE.md](public-docs/RECREATE.md) (the workflow) and [public-docs/ALGORITHMS.md](public-docs/ALGORITHMS.md) (every algorithm and constant) |
+| Release it the careful way | [public-docs/RELEASE_METHOD.md](public-docs/RELEASE_METHOD.md) |
 
 ![Isometric block model of the tutorial sample](tutorial/preview.png)
 
 *Tutorial preview from © OpenStreetMap contributors (ODbL), USA Structures: ORNL and FEMA Geospatial Response Office (CC BY 4.0), and U.S. Geological Survey 3DEP elevation (public domain).*
 
-## Run the synthetic checks
+## The toolkit
 
-Use Node.js 22+ and Python 3.12+. There are no JavaScript dependencies. NumPy is the only Python dependency.
+```bash
+node toolkit/build.mjs --sample --out=work/sample                                     # the bundled sample, offline
+node toolkit/build.mjs --source=work/myarea/source --bbox=W,S,E,N --out=work/myarea  # your area: map.osm, dem.tif, structures
+```
+
+`map.html` is one self-contained file. Open it in any browser with WebGL2: no server, no network, no account. It draws:
+
+- crack-free terrain and buildings whose heights say where they came from;
+- roofs, windows that light up at night, and seasonal trees;
+- the real sun with soft shadows;
+- the moon and stars where they are for the chosen time;
+- a ground-level walk that cannot pass through walls.
+
+For your own area, download an OpenStreetMap export, a USGS 3DEP elevation tile and (in the US) USA Structures from the publishers' own download pages; the [toolkit README](toolkit/README.md) gives the steps. A download script, `fetch.mjs`, is included too, but it obeys each host's `robots.txt` and fails closed, and on 2026-11-15 all three services refused automated access, so it stops by design.
+
+## The methods
+
+| Module | Purpose |
+| --- | --- |
+| [terrain.mjs](methods/terrain.mjs) | Crack-free triangulation where terrain cells of different sizes meet |
+| [projection.mjs](methods/projection.mjs) | Orthographic projection and its inverse at a known height |
+| [buildings.mjs](methods/buildings.mjs) | Oriented box, height by source priority, seating on slopes, roof forms, facade bays |
+| [roof.mjs](methods/roof.mjs) | Parametric saddle (hypar) surface |
+| [collision.mjs](methods/collision.mjs) | Swept movement against wall segments, push-out, gaps at gates, walls sliced from a mesh |
+| [graph.mjs](methods/graph.mjs) | Networks from mapped lines, A*, the strongly connected core, pruning by walls |
+| [ground.mjs](methods/ground.mjs) | Mode-aware routes, observer poses, swept boxes and stopping caps |
+| [sky.mjs](methods/sky.mjs) | Sun, moon, sidereal time, star visibility, light and season weights |
+| [traffic.mjs](methods/traffic.mjs) | Car following (IDM), lanes, junction zones, U-turns, turn preferences |
+| [roles.mjs](methods/roles.mjs), [conversation.mjs](methods/conversation.mjs) | Weighted stops for fictional roles; brief replies with one owner |
+| [motion.mjs](methods/motion.mjs) | Animation of confirmed live positions with stale and out-of-order guards |
+| [lidar.mjs](methods/lidar.mjs) | Surface and ground rasters, roof levels, model agreement, audit classes |
+| [packs.mjs](methods/packs.mjs) | Content-addressed data packs; appearance versus label hashes |
+| [raster.py](methods/raster.py) | Alignment, semantic compositing, bounded colour gains and overlap blending |
+| [provenance.py](methods/provenance.py) | Immutable settings hashes and file manifests |
+
+## Run the checks
+
+Use Node.js 22+ and Python 3.12+. There are no JavaScript dependencies, and NumPy is the only Python dependency.
 
 ```bash
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
-npm test
+npm test                                                     # methods, tutorial and toolkit
 .venv/bin/python -B -m unittest discover -s method-tests -p 'test_*.py' -v
-python3 -B publication/check.py --ref HEAD
 ```
 
-No account, API key, GPU or network service is needed after dependency installation. `npm test` also runs the tutorial on the bundled sample.
-
-```js
-import {terrainMesh} from './methods/terrain.mjs';
-import {camera} from './methods/projection.mjs';
-
-const mesh = terrainMesh([{x: 0, y: 0, size: 4}], (x, y) => Math.sin(x) + y / 4);
-const view = camera({heading: Math.PI / 4, scale: 2});
-const screenVertices = mesh.vertices.map(p => view.project(p));
-```
+Nothing is downloaded and no key or GPU is needed. `npm test` also runs the tutorial and builds the sample map.
 
 ## Read the workflow
 
-- [Methods and limits](public-docs/METHODS.md): terrain, geometry, guarded painting, stitching, motion and visual checks.
-- [Ground-level movement and conversations](public-docs/GROUND_LEVEL.md): routing, contact, fictional roles, short replies and touch/HUD review.
-- [Hands-on tutorial](tutorial/README.md) and its [sample data](sample/README.md): three open datasets, their licences and attribution.
-- [Public source references](public-docs/DATA_SOURCES.md): source roles and attribution.
-- [Reproducibility](public-docs/REPRODUCIBILITY.md): inputs, settings, resume rules and validation.
-- [Publication boundary](public-docs/PUBLICATION.md): exact-file and history review.
-- [Release method](public-docs/RELEASE_METHOD.md): one gated, reproducible release for site deployments, regenerated layers and publication.
-- [Reusable skills](public-skills/README.md): terrain review, guarded painting and methods publication.
-- [Banner provenance](public-docs/BANNER.md): fictional illustration and prompt.
+- [Algorithms](public-docs/ALGORITHMS.md): the complete reference, from coordinate frames to traffic, lidar fitting and tile pyramids.
+- [Recreating without AI](public-docs/RECREATE.md): the order of work, who does what, and when each stage is done.
+- [Methods and limits](public-docs/METHODS.md): what each module assumes and where it stops.
+- [Ground-level movement](public-docs/GROUND_LEVEL.md): routing, contact, fictional roles and brief replies.
+- [Public sources](public-docs/DATA_SOURCES.md) and the [sample](sample/README.md): licences, attribution and terms.
+- [Reproducibility](public-docs/REPRODUCIBILITY.md): inputs, settings, resume rules and what the tests cover.
+- [Release method](public-docs/RELEASE_METHOD.md): gated, reproducible releases of a site, a regenerated layer, or this repository.
+- [Publication boundary](public-docs/PUBLICATION.md): how this repository is kept to methods and public data.
+- [Skills](public-skills/README.md): step-by-step procedures, usable by a person as checklists or by an agent.
+- [Banner provenance](public-docs/BANNER.md): fictional illustration and its prompt.
 
 ## Licence and contributions
 
-Code and documentation use [Apache-2.0](LICENSE). It does not grant rights to external datasets or institutional names and marks. The files in `sample/` keep their own licences (ODbL, CC BY 4.0, public domain), and so does anything rendered from them, including `tutorial/preview.png`. See [sample/README.md](sample/README.md). The AI-generated banner is included under the same repository licence to the extent rights are available; no exclusive copyright claim is made for AI-generated content.
+Code and documentation use [Apache-2.0](LICENSE). It does not grant rights to external datasets or to anyone's names and marks.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md). Contributions must use synthetic examples or the bundled sample, and must not include real campus or personnel data.
+- **Data licences:** the files in `sample/` keep their own licences (ODbL, CC BY 4.0, public domain, CC0), and so does anything rendered from them, including `tutorial/preview.png`. Data you fetch with the toolkit stays under its publishers' terms.
+- **The banner:** it is AI-generated and is included under the repository licence to the extent rights are available. No exclusive copyright is claimed for AI-generated content.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md). Contributions must use synthetic examples or public data with a redistribution licence.

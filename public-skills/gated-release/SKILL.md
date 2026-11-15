@@ -24,4 +24,6 @@ Gate the picture on textured content, calibrated on real accepted and rejected c
 
 For publication, commit only allowlisted files in an isolated clean clone. Build a reviewer pack: exact archive tree, manifest, history, refs, tests, secret scans, metadata of every pinned binary, and the push command. After approval, push only that commit as a fast-forward. Then verify the remote tree, blobs, modes, CI and settings. Run the publication check yourself on a fresh repository of exactly the allowlisted files before handing over a candidate.
 
+When data lives in content-addressed packs, pin every pack and allow a data-only release only if the page is byte for byte the live one. Capture live 3D views on frames that actually return (a fixed number over several healthy polls, at least one within a time limit), and keep frame-rate numbers as evidence of the capture machine unless a view sets a policy. Declare data files that frozen tests read, so the package snapshot carries them.
+
 Test the tool with fakes called by absolute path. Check "nothing written" with before-and-after snapshots of the folder. Add a regression test for every review finding, and list changed files with hashes for each review round.

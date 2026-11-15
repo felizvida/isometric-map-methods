@@ -5,6 +5,8 @@ description: Prepare and verify a public methods repository while excluding loca
 
 Translate the user's publication boundary into an explicit file allowlist. Preserve the original project privately. Newly write or review every line of generalised modules; removing a data directory alone does not remove embedded parameters, keys, endpoints or records from source.
 
+Keep organisation-specific disclosure patterns (internal domains, hostnames, project and organisation names) in a private deny file passed to the publication check, so the public check names nobody; a configured file that is missing must stop the candidate. Remember that history is public too: a name removed from the latest tree remains in earlier commits.
+
 Use runtime-generated synthetic test inputs. Reference public publisher landing pages without copying source records. Create any requested illustration from fictional forms without reference data. Inspect binary metadata as well as visible pixels.
 
 Inspect the target's existing refs before preparing history. Preserve legitimate history with a normal fast-forward; do not force-push to resolve an unexpected parent. Inspect every reachable commit for disclosure. Use the account's public no-reply identity rather than an internal email unless the user explicitly requests otherwise.

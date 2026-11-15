@@ -1,14 +1,15 @@
 # Sample data: a neighbourhood park in Bethesda, Maryland
 
-A deliberately small real-world sample for the [hands-on tutorial](../tutorial/README.md): about 130 × 132 m around a public park with three apartment buildings, courts, a playground, a rail trail, paths and a street. Total size is about 40 KB.
+A deliberately small real-world sample for the [hands-on tutorial](../tutorial/README.md) and the [toolkit](../toolkit/README.md): about 130 × 132 m around a public park with three apartment buildings, courts, a playground, a rail trail, paths and a street, plus a list of bright stars for the night sky. Total size is about 80 KB.
 
-The three files come from three public sources under **three different licences**. The repository's Apache-2.0 licence covers its code and documentation, **not this data**. When you reuse a file, keep its attribution and follow its licence.
+The four files come from four public sources under **four different licences**. The repository's Apache-2.0 licence covers its code and documentation, **not this data**. When you reuse a file, keep its attribution and follow its licence.
 
 | File | Content | Source | Licence | Attribution to keep |
 | --- | --- | --- | --- | --- |
 | `features.geojson` | 28 features: 3 building footprints, park, 2 courts, playground (clipped), road, service, cycle and foot ways | OpenStreetMap, snapshot 2026-11-09 (Overpass API) | [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/) | © OpenStreetMap contributors |
 | `structures.geojson` | 4 structure footprints with published heights | USA Structures, retrieved 2026-11-08 | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | USA Structures: Oak Ridge National Laboratory (ORNL) and FEMA Geospatial Response Office |
 | `terrain.json` | Bare-earth heights on 2 m nodes (67 × 68) | USGS 3D Elevation Program (3DEP) | Public domain (U.S. Government work) | Map services and data available from U.S. Geological Survey, National Geospatial Program. |
+| `stars.json` | 1,564 stars to magnitude 5: right ascension, declination, V magnitude, B−V (mostly null) | Wikidata structured data, retrieved 2026-11-15 | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | None required; "star positions from Wikidata" is a courtesy |
 
 ## What was changed
 
@@ -16,6 +17,7 @@ These are the "changes made" that CC BY asks you to indicate, and the derivation
 
 - **OpenStreetMap.** Ways inside the box (lon −77.10110 to −77.09960, lat 38.99125 to 38.99244) were clipped to the box; buildings were kept only if wholly inside. Each feature keeps only a generic `kind`, its OSM way id (`osm`), and where present `levels`, `sport` and `surface`. Names, addresses and every other tag were removed. Coordinates are rounded to 7 decimals (about 1 cm). The extract remains under ODbL. If you publish a database derived from it, it must be offered under ODbL too.
 - **USA Structures.** Footprints whose centroid is inside the box were kept whole, with five fields: `height_m`, `occupancy_class`, `source`, `image_date` and `validation`. Addresses, identifiers, population estimates and all other attributes were removed. Heights are as published; most are marked "Unverified", and one is missing.
+- **Wikidata stars.** Stars with a Bright Star catalogue identifier, an explicit V-band apparent magnitude and positions in degrees were kept; positions were rounded to 0.01° and close duplicates merged. B−V is unknown for most and left null rather than invented. It is a list for drawing a believable sky, not an astrometric catalogue: epochs are as stored upstream (about J2000), and precession is not applied.
 - **USGS 3DEP.** Requested from the 3DEP elevation image service as a float32 raster in WGS84 longitude and latitude at about 1 m. It was then sampled bilinearly at the 2 m nodes of the local frame below and stored as integer centimetres above `z_base_m`. The source project and acquisition date are listed below.
 
 ## Frame and units

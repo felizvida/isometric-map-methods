@@ -19,9 +19,13 @@ node tutorial/step1-load.mjs
 node tutorial/step2-terrain.mjs
 node tutorial/step3-buildings.mjs
 node tutorial/step4-render.mjs        # writes tutorial/out/preview.png
+node tutorial/step5-buildings.mjs     # the toolkit's fuller building rules
+node tutorial/step6-walk.mjs          # a walking network and walls you cannot pass
+node tutorial/step7-sky.mjs           # sun, shadows, moon and stars for any moment
+node toolkit/build.mjs --sample --out=tutorial/out/map   # step 8: open tutorial/out/map/map.html
 ```
 
-`npm test` runs the same pipeline and compares it with [`expected.json`](expected.json) and `preview.png`.
+Steps 1 to 4 build a still picture from first principles. Steps 5 to 8 use the same data with the [end-to-end toolkit](../toolkit/README.md) and finish with an interactive map you can turn, walk through and light for any date. `npm test` runs every step and compares steps 1 to 4 with [`expected.json`](expected.json) and `preview.png`.
 
 ## Step 1: one frame for three datasets
 
@@ -90,6 +94,49 @@ The last line of step 4 shows why the inverse projection needs a height. A roof 
 - Drape the roads by lowering the terrain under them to a smooth profile, then compare kerb heights.
 - Add a second view and check that the same world point lands at the predicted pixel in both.
 
+## Step 5: fuller building rules
+
+`step5-buildings.mjs` runs the toolkit's building rules ([`methods/buildings.mjs`](../methods/buildings.mjs)) on the same three footprints. Three things change from step 3.
+
+- **Height by a priority list.** A hand-checked value wins, then a mapped `height` tag, then a matched USA Structures height, then `levels × storey`, then a default. The structures match is stricter than step 3's: the structure must cover at least 60 % of the footprint, the two areas must agree within 0.55 to 1.8 times, and the height must lie between 2.5 and 150 m. One building now falls back to the default although a structure covers 81 % of it, because that structure is much larger than the footprint: it probably spans a neighbour too. The script prints the rule three ways so you can see which condition decides.
+- **Roof forms on an oriented box.** Gabled, hipped, pyramidal, skillion and barrel roofs are built on the footprint's minimum-area rectangle, and only when the footprint fills more than 72 % of it. All three sample buildings are flat-roofed in OpenStreetMap, and the tallest fills only 67 % of its box.
+- **Facade bays.** A wall is divided into equal bays from the style's spacing, after corner piers, with windows placed as fractions of each bay and storey. Walls shorter than 2 m get none.
+
+**Try it.** Copy `sample/` to `work/mysample`, give the smallest building `"roof_shape": "hipped"` in its `features.geojson`, and build a map from it with `node toolkit/build.mjs --layers=work/mysample --out=work/mysample-map` (step 8). The footprint must fill more than 72 % of its box for the roof to appear.
+
+## Step 6: walking without passing through walls
+
+`step6-walk.mjs` builds a walking network from the footways, sidewalks, crossings, paths and streets ([`methods/graph.mjs`](../methods/graph.mjs)). Nodes are welded where lines meet within 10 cm. A link along a street is walked on the pavement, offset to the right by half the street's width plus 0.9 m. Then every link a body could not walk is removed: one that crosses a wall (a building outline, or a fence or wall line with its gates cut open) or runs inside a building. The remaining network is reduced to its strongly connected core, so that nobody is ever placed where they cannot walk back from.
+
+The second half fires 10,000 random steps of up to 6 m from points outside buildings, through the swept movement of [`methods/collision.mjs`](../methods/collision.mjs): each step stops 1 cm before the first wall it would cross and slides along it. None ends inside a building. Without the sweep, about 170 do: a single long step jumps straight over a zero-thickness wall, which is what happens on a slow phone when the walker covers more than its own radius in one frame.
+
+**Try it.** In an area of your own, delete a fence's gate node from `map.osm` and see the path through it drop out of the network.
+
+## Step 7: the sky for any moment
+
+`step7-sky.mjs --date=<ISO time>` computes, for the sample's location, the sun's elevation and azimuth (NOAA formulas), the length and direction of the tallest building's shadow, the moon's position and phase, and which of the 1,564 stars in [`sample/stars.json`](../sample/README.md) are above the horizon and bright enough to draw ([`methods/sky.mjs`](../methods/sky.mjs)). The faintest star drawn depends on the hour and on a bright moon, and twilight fades stars in between sun elevations of −4° and −13°.
+
+```text
+node tutorial/step7-sky.mjs --date=2026-06-21T12:00:00-04:00
+node tutorial/step7-sky.mjs --date=2026-12-21T23:00:00-05:00
+```
+
+**Try it.** Find the date when the tall building's noon shadow is longest, and check it against the winter solstice.
+
+## Step 8: an interactive map
+
+```bash
+node toolkit/build.mjs --sample --out=tutorial/out/map
+```
+
+This writes layers, content-addressed data packs and `tutorial/out/map/map.html`, a single file that opens in any browser with WebGL2, with no server and no network. Drag to pan, scroll to zoom, press E to turn. Click a building for its height and where the height came from. Move the time slider through a day, or pick a winter date and watch the trees go bare. Press V to walk at eye level. You can walk with W A S D or click the ground to be walked there along the network from step 6. At night, look up: the stars are where they really are for that time.
+
+To do the same for another small area, download its public data first: an OpenStreetMap export (`map.osm`), a USGS elevation tile prepared as `dem.tif`, and in the US optionally a USA Structures extract. The toolkit's README gives the steps and the data terms. Then:
+
+```bash
+node toolkit/build.mjs --source=work/myarea/source --bbox=W,S,E,N --out=work/myarea
+```
+
 ## What this tutorial is not
 
-This is a block model: flat roofs, extruded walls and no facade detail. It is not a survey product. The terrain and footprints come from different surveys and dates, and the heights are as published (marked "Unverified" in the source). Read [`../public-docs/METHODS.md`](../public-docs/METHODS.md) for the limits of each method. Read the sample README for each dataset's date, licence and required attribution.
+This is a block model: extruded walls, simple roofs and facades drawn by rule. It is not a survey product. The terrain and footprints come from different surveys and dates, and the heights are as published (marked "Unverified" in the source). Hand-modelled buildings fitted to lidar are described in [`../public-docs/ALGORITHMS.md`](../public-docs/ALGORITHMS.md), and [`../public-docs/RECREATE.md`](../public-docs/RECREATE.md) describes the whole workflow from data to a released map. Read [`../public-docs/METHODS.md`](../public-docs/METHODS.md) for the limits of each method. Read the sample README for each dataset's date, licence and required attribution.

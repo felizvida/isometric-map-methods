@@ -44,3 +44,18 @@ test('PNG round trip and ear clipping of a concave footprint', () => {
   assert.equal(tris.length, pts.length - 2);
   assert.ok(Math.abs(area - signedArea(L)) < 1e-9);
 });
+
+test('steps 5 to 7 run on the sample and report what the README says', async () => {
+  const {execFileSync} = await import('node:child_process');
+  const run = (step, ...args) => execFileSync(process.execPath, [new URL(step, T).pathname, ...args], {encoding: 'utf8'});
+  const s5 = run('step5-buildings.mjs');
+  assert.match(s5, /way\/117595351\s+7\.60 m\s+default/);
+  assert.match(s5, /way\/117595378\s+17\.40 m\s+structures/);
+  const s6 = run('step6-walk.mjs');
+  assert.match(s6, /0 ended inside a building/);
+  const s7 = run('step7-sky.mjs', '--date=2026-06-21T12:00:00-04:00');
+  assert.match(s7, /Sun: elevation 68\.\d+°/);
+  assert.match(s7, /twilight factor 0\.00 -> 0 drawn/);
+  const night = run('step7-sky.mjs', '--date=2026-12-21T23:00:00-05:00');
+  assert.match(night, /twilight factor 1\.00 -> [1-9]\d* drawn/);
+});

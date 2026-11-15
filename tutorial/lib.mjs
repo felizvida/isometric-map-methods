@@ -48,9 +48,10 @@ export function localFeatures(fc, frame) {
     const g = f.geometry, out = {kind: f.properties.kind, props: f.properties};
     if (g.type === 'Polygon') out.ring = g.coordinates[0].map(frame.toLocal);
     else if (g.type === 'LineString') out.line = g.coordinates.map(frame.toLocal);
+    else if (g.type === 'Point') return null;                         // trees and gates: used by the toolkit, not here
     else throw new Error('unexpected geometry ' + g.type);
     return out;
-  });
+  }).filter(Boolean);
 }
 
 // ------------------------------------------------------------------ 2. adaptive terrain mesh

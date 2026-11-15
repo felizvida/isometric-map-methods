@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Isometric map viewer</title>
+<style>
+  :root { color-scheme: light; --ink: #26302b; --panel: rgba(250, 248, 242, 0.94); --line: #d8d3c6; --accent: #2f684f; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #e6ece4; font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); }
+  canvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
+  .bar { position: fixed; top: 12px; left: 12px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; background: var(--panel);
+         border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; max-width: calc(100vw - 40px); }
+  .bar b { margin-right: 6px; }
+  button { font: inherit; border: 1px solid var(--line); background: #fff; border-radius: 7px; padding: 4px 10px; cursor: pointer; color: var(--ink); }
+  button[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+  input[type=range] { width: 140px; }
+  #card { position: fixed; right: 12px; top: 12px; width: 250px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+          padding: 10px 12px; display: none; }
+  #card h3 { margin: 0 0 6px; font-size: 15px; }
+  #card table { border-collapse: collapse; width: 100%; } #card td { padding: 2px 0; vertical-align: top; } #card td:first-child { color: #66706a; width: 46%; }
+  /* help and credits flow together at the bottom, so a wrapped credit line never covers the help */
+  .foot { position: fixed; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; pointer-events: none; }
+  #help { margin-left: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; font-size: 12px;
+          max-width: min(520px, calc(100vw - 48px)); pointer-events: auto; }
+  #credit { align-self: stretch; padding: 4px 10px; font-size: 11px; background: rgba(250, 248, 242, 0.85); pointer-events: auto; }
+  @media (max-width: 600px) { #help { font-size: 11px; } }
+  #err { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: #f6f3ea; padding: 30px; text-align: center; }
+</style>
+</head>
+<body>
+<canvas id="map"></canvas>
+<div class="bar">
+  <b id="name">Map</b>
+  <button id="turn" title="Turn the map a quarter (E)">Turn</button>
+  <button id="walk" title="Walk at ground level (V)" aria-pressed="false">Walk</button>
+  <button id="daylight" title="Noon today under a clear sky (L)" aria-pressed="false">Daylight</button>
+  <label title="Time of day (your time zone)">Time <input id="hour" type="range" min="0" max="24" step="0.25"></label>
+  <input id="date" type="date" title="Date">
+  <span id="clock"></span>
+</div>
+<div id="card"></div>
+<div class="foot">
+  <div id="help">Drag to pan, wheel to zoom, right-drag to rotate, click a building for its card. Walk: W A S D or arrows, drag to look,
+    Shift to run, click the ground to walk there, Esc for the map.</div>
+  <div id="credit"></div>
+</div>
+<div id="err"></div>
+<script type="module" src="viewer.mjs"></script>
+</body>
+</html>

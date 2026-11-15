@@ -2,17 +2,19 @@ cff-version: 1.2.0
 message: "If you use these methods, cite the repository and specific commit."
 title: "Isometric Map Methods"
 type: software
-version: 0.1.0
-date-released: 2026-11-12
+version: 0.2.0
+date-released: 2026-11-15
 authors:
   - name: "felizvida"
-repository-code: "https://github.com/felizvida/nichd-map"
-url: "https://github.com/felizvida/nichd-map"
+repository-code: "https://github.com/felizvida/isometric-map-methods"
+url: "https://github.com/felizvida/isometric-map-methods"
 license: Apache-2.0
-abstract: "Data-free algorithms and verification workflows for terrain-aware isometric maps."
+abstract: "Algorithms, an end-to-end open-data toolkit and verification workflows for terrain-aware isometric maps with a ground-level walk, documented completely enough to rebuild without AI."
 keywords:
   - isometric
   - terrain
   - geospatial
   - image-processing
   - reproducibility
+  - openstreetmap
+  - webgl

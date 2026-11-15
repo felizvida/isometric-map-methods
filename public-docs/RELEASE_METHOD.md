@@ -112,9 +112,24 @@ A screenshot is evidence only once the map has drawn. In software-rendered headl
    - It passes fog, snow and a small map in a narrow viewport.
    - Calibrate it on real captures, including a capture that was correctly rejected.
 
+## Data releases, live views and patches
+
+The method grew with the map. Five additions matter for anyone building their own:
+
+- **Data in packs, and data-only releases.** The page loads its data as content-addressed packs (ALGORITHMS.md §12). Freeze rebuilds the page and every pack from the clean copy and pins each one. Marker checks search the page and all packs, because card text and ids live in the packs. Package, verify, local checks and the live check compare every pack with its pin. A *data-only* release changes packs but not code: freeze refuses unless the page is byte for byte the live one. Review the change first with a pack diff (added, removed, shape or label-only, per record) and a staleness list for any painted layer.
+- **Live views as well as painted ones.** A view now has a kind.
+  - **Live** captures, of the 3D map drawn every frame, settle on frames that actually return. They need the scene built, no painting wanted, and no error, error banner or lost context. They count 20 frames over 3 healthy polls, and any unhealthy poll restarts the count. At least one frame must arrive within 15 s, or the check reports that rendering stopped.
+  - Frame rate, first-frame delay and the WebGL renderer are recorded as evidence of the capture machine. A minimum frame rate fails a view only if that view asks for one, and it is reported as a policy failure, not a broken page.
+  - **Painted** views keep the tile-based settle described above.
+- **Test inputs travel with the snapshot.** A test suite that reads a data file beyond the page's own inputs needs that file in the package's source snapshot, or the frozen tests fail. Declare such files with the suites that use them. Copy them in only after the snapshot has reproduced the page without them, and record them in the review. A unit test fails when a configured suite reads a data file that is neither in the snapshot nor declared.
+- **Patch repaints.** When a few buildings change, repaint their regions instead of the whole grid. Each region is the old and new building pixels grown by a margin, minus every other building. The regions are chained onto the live mosaic in order, with a hash chain from the base mosaic to the final one, and the alpha must equal the base's. Nothing outside the regions may change, so the rim and road passes are skipped.
+- **A fixed scorecard before and after** (ALGORITHMS.md §18) turns "it looks better" into numbers. Two runs of an unchanged tree must agree exactly, and a changed measurement method makes runs "not directly comparable" rather than better or worse.
+
+Everything in this method can be run by people. The tool exists so that the steps are identical every time and so that it refuses when anything has drifted, not to replace the owner, the operator or the reviewer.
+
 ## Publishing a methods repository
 
-1. **Candidate.** Copy only allowlisted files into an isolated clean clone of the published branch, with no remote back to the private workspace. Run the publication check on the index, commit, and run it again on the commit.
+1. **Candidate.** Copy only allowlisted files into an isolated clean clone of the published branch, with no remote back to the private workspace. Run the publication check on the index, commit, and run it again on the commit. Organisation-specific disclosure patterns (internal domains, hostnames, project names) come from a private file the tool passes to the check, so the public check names no organisation.
 2. **Audit pack.** Assemble everything the reviewer needs:
    - the extracted `git archive` tree with a hash manifest;
    - history, refs, stashes and remotes;
